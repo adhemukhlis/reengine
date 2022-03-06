@@ -1,65 +1,51 @@
-import Head from 'next/head'
-import styles from '../styles/Home.module.css'
+import React, { useState } from "react";
+import axios from "axios";
+import { getDir } from "../lib/main";
 
-export default function Home() {
+export default function Home({ allDir }) {
+  const [data, setData] = useState(allDir);
+  const [input, setInput] = useState("");
+  const fetchTest = async () => {
+    const data = await axios.post(`http://localhost:3000/api/write_file`, {
+      name: input,
+      fileType: "tsx",
+      prefix: "View",
+    });
+    setData(data.data.dir);
+    setInput("");
+  };
+  const inputHandler = (e) => {
+    setInput(e.target.value);
+  };
   return (
-    <div className={styles.container}>
-      <Head>
-        <title>Create Next App</title>
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
-
-      <main className={styles.main}>
-        <h1 className={styles.title}>
-          Welcome to <a href="https://nextjs.org">Next.js!</a>
-        </h1>
-
-        <p className={styles.description}>
-          Get started by editing{' '}
-          <code className={styles.code}>pages/index.js</code>
-        </p>
-
-        <div className={styles.grid}>
-          <a href="https://nextjs.org/docs" className={styles.card}>
-            <h3>Documentation &rarr;</h3>
-            <p>Find in-depth information about Next.js features and API.</p>
-          </a>
-
-          <a href="https://nextjs.org/learn" className={styles.card}>
-            <h3>Learn &rarr;</h3>
-            <p>Learn about Next.js in an interactive course with quizzes!</p>
-          </a>
-
-          <a
-            href="https://github.com/vercel/next.js/tree/master/examples"
-            className={styles.card}
-          >
-            <h3>Examples &rarr;</h3>
-            <p>Discover and deploy boilerplate example Next.js projects.</p>
-          </a>
-
-          <a
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-          >
-            <h3>Deploy &rarr;</h3>
-            <p>
-              Instantly deploy your Next.js site to a public URL with Vercel.
-            </p>
-          </a>
-        </div>
-      </main>
-
-      <footer className={styles.footer}>
-        <a
-          href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Powered by{' '}
-          <img src="/vercel.svg" alt="Vercel Logo" className={styles.logo} />
-        </a>
-      </footer>
+    <div>
+      <div style={{ display: "flex", padding: "2vh" }}>
+        <input
+          value={input}
+          onChange={inputHandler}
+          style={{ marginRight: "2vh" }}
+        />
+        <button onClick={fetchTest}>create</button>
+      </div>
+      <div style={{ display: "flex", flexDirection: "column", padding: "2vh" }}>
+        <h2>list files</h2>
+        <code>
+          *the generated files are stored in <b>{"<root_project>"}/generated</b>
+        </code>
+        <ol>
+          {data.map((item) => (
+            <li>{item}</li>
+          ))}
+        </ol>
+      </div>
     </div>
-  )
+  );
 }
+export const getStaticProps = async () => {
+  const allDir = getDir();
+  return {
+    props: {
+      allDir,
+    },
+  };
+};
