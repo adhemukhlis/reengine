@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import axios from "axios";
 import { getDir } from "../lib/main";
+import project from "../_re_configs/project";
 
 export default function Home({ allDir }) {
   const [data, setData] = useState(allDir);
@@ -17,6 +18,14 @@ export default function Home({ allDir }) {
   const inputHandler = (e) => {
     setInput(e.target.value);
   };
+
+  const generateConfig = async()=>{
+    const data = await axios.post(`http://localhost:3000/api/initiate_file`);
+    setData(data.data.dir);
+  }
+  useEffect(()=>{
+    generateConfig()
+  },[])
   return (
     <div>
       <div style={{ display: "flex", padding: "2vh" }}>
